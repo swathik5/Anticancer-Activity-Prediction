@@ -203,53 +203,30 @@ def plot_result(x_label, y_label, plot_title, train_data, val_data):
 def mlp_model():
  
 	##### MODEL ARCHITECTURE
-	structured_input = layers.Input(shape=(421,)
-		                       , name='structured_features_input'
+	mlp_input = layers.Input(shape=(421,)
+		                       , name='mlp_input'
 		                      )
 
-	x = layers.Dense(421, 
-		         activation='relu', 
-		         kernel_initializer='he_normal')(structured_input) #80
+	x = layers.Dense(421, activation='relu', kernel_initializer='he_normal')(mlp_input)
 	dense_hidden = Dense(25, activation='relu', name='dense_hidden')(x)
 	last_layer = Dense(1, activation='sigmoid')(dense_hidden)
-	    
-
-	# declare the final model inputs and outputs
+ 
 	model = Model(inputs=structured_input, outputs=last_layer)
 
 	# print a summary of the model
 	print(model.summary())
 
-	# set up learning rate decay schedule
-	initial_learning_rate = 0.1
-	lr_schedule = ExponentialDecay(
-	    initial_learning_rate,
-		decay_steps=100000,
-	    decay_rate=0.96,
-	    staircase=True)
-
+	# learning rate decay schedule
+	initial_learning_rate = 0.1, lr_schedule = ExponentialDecay(initial_learning_rate, decay_steps=100000, decay_rate=0.96, staircase=True)
 	stop = EarlyStopping(monitor="val_loss", patience=50, restore_best_weights=True, mode='min', verbose=1)
 	best = ModelCheckpoint(filepath='/home/dell11/mlp_t/kfold/best_structured_model_MLP_model_kfold.hdf5', save_best_only=True, monitor='val_loss', mode='min', verbose=1)
-
 	# compile the model
-	model.compile(optimizer=Adam(learning_rate=lr_schedule, epsilon=1), 
-		            loss="binary_crossentropy", 
-		            metrics=['accuracy'])
+	model.compile(optimizer=Adam(learning_rate=lr_schedule, epsilon=1), loss="binary_crossentropy", metrics=['accuracy'])
 
-	#plot_model(mlp, show_shapes=True, to_file='mlp_model1_structured.png')
-
-
-	results = model.fit(
-		    X_train2, Y_train2,
-		    epochs=200,
-		    callbacks=[stop, best],
-		    validation_data=([X_test2, Y_test2])
-		    )
+	results = model.fit(X_train2, Y_train2, epochs=200, callbacks=[stop, best], validation_data=([X_test2, Y_test2]))
 
 	model.save('/home/dell11/mlp_t/kfold/best_structured_model_MLP_model_kfold.h5')
 	return model
-
-
 Kmodel = KerasClassifier(build_fn=lambda:mlp_model(), verbose=1)
 
 mlp_model_result = cross_validation(Kmodel, X_train2, Y_train2, 5)
