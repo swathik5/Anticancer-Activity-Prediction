@@ -14,7 +14,6 @@ from tensorflow import keras
 import matplotlib.pyplot as plt
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 from tensorflow.keras import layers
 from keras.models import Model
 from keras.layers import Dense
@@ -119,7 +118,7 @@ df["dist_char_ohe"] = df["smiles_modified"].apply(
     smiles_to_onehot, character_maximum=largest_smiles_len, dist_char=dist_char
 )
 
-#SMOTE oversampling, train_test_split and normalization
+#SMOTE oversampling, train-test split
 X = df[['dist_char_ohe','Activity']]
 X.columns = ['feature_N' + str(i + 1) for i in range(X.shape[1])]
 x = X['feature_N1'].explode().to_frame()
@@ -137,13 +136,6 @@ y1=target
 smote = SMOTE(random_state=0)
 X_over, y_over = smote.fit_resample(X1, y1)
 X_train2, X_test2, Y_train2, Y_test2 = train_test_split(X_over, y_over, random_state=42)
-#Normalization
-scaler = StandardScaler()
-scaler.fit(X_train2)
-X_train2 = scaler.transform(X_train2)
-scaler.fit(X_test2)
-X_test2 = scaler.transform(X_test2)
-
 # K-Fold Cross-Validation
 from sklearn.model_selection import cross_validate
 def cross_validation(model, X_train2, Y_train2, _cv=5):
