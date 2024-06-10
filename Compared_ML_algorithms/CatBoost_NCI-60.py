@@ -13,7 +13,6 @@ from tensorflow import keras
 import matplotlib.pyplot as plt
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 from catboost import CatBoostClassifier
 from sklearn.metrics import classification_report, matthews_corrcoef
 from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score, roc_auc_score, roc_curve
@@ -143,12 +142,6 @@ y1=target
 smote = SMOTE(random_state=0)
 X_over, y_over = smote.fit_resample(X1, y1)
 X_train2, X_test2, Y_train2, Y_test2 = train_test_split(X_over, y_over, random_state=42)
-scaler = StandardScaler()
-scaler.fit(X_train2)
-X_train2 = scaler.transform(X_train2)
-scaler.fit(X_test2)
-X_test2 = scaler.transform(X_test2)
-
 
 #Implementing CatBoost algorithm
 CBC = CatBoostClassifier(depth=10, iterations=100, learning_rate=0.04)
